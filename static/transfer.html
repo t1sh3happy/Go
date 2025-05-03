@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Перевод между счетами</title>
+  </head>
+  <body>
+    <h2>Перевод средств</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea
+      id="tokenInput"
+      rows="5"
+      cols="60"
+      placeholder="Вставьте токен"
+    ></textarea
+    ><br /><br />
+    <button onclick="pasteToken()">🔄 Вставить токен</button>
+
+    <p>
+      <label>Откуда (account_id):</label><br />
+      <input type="number" id="fromId" /><br />
+      <label>Куда (account_id):</label><br />
+      <input type="number" id="toId" /><br />
+      <label>Сумма:</label><br />
+      <input type="number" id="amount" step="0.01" /><br /><br />
+      <button onclick="sendTransfer()">📤 Перевести</button>
+    </p>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        try {
+          const token = await navigator.clipboard.readText();
+          document.getElementById("tokenInput").value = token;
+        } catch {
+          alert("Ошибка чтения из буфера");
+        }
+      }
+
+      async function sendTransfer() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const body = {
+          from_account_id: parseInt(document.getElementById("fromId").value),
+          to_account_id: parseInt(document.getElementById("toId").value),
+          amount: parseFloat(document.getElementById("amount").value),
+        };
+
+        const res = await fetch("/api/transfer", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

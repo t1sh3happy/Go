@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Баланс счёта</title>
+  </head>
+  <body>
+    <h2>Пополнение / Списание</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea
+      id="tokenInput"
+      rows="5"
+      cols="60"
+      placeholder="Вставьте токен"
+    ></textarea
+    ><br /><br />
+    <button onclick="pasteToken()">🔄 Вставить токен</button>
+
+    <p>
+      <label>ID счёта:</label><br />
+      <input type="number" id="accountId" required /><br />
+      <label>Сумма:</label><br />
+      <input type="number" id="amount" step="0.01" required /><br /><br />
+      <button onclick="deposit()">➕ Пополнить</button>
+      <button onclick="withdraw()">➖ Списать</button>
+    </p>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        try {
+          const token = await navigator.clipboard.readText();
+          document.getElementById("tokenInput").value = token;
+        } catch {
+          alert("Ошибка доступа к буферу обмена");
+        }
+      }
+
+      async function deposit() {
+        await send("/api/accounts/deposit");
+      }
+
+      async function withdraw() {
+        await send("/api/accounts/withdraw");
+      }
+
+      async function send(url) {
+        const token = document.getElementById("tokenInput").value.trim();
+        const body = {
+          account_id: parseInt(document.getElementById("accountId").value),
+          amount: parseFloat(document.getElementById("amount").value),
+        };
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Профиль /api/me</title>
+  </head>
+  <body>
+    <h2>Проверка авторизации</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea
+      id="tokenInput"
+      rows="5"
+      cols="60"
+      placeholder="Вставьте токен сюда"
+    ></textarea
+    ><br /><br />
+
+    <button onclick="pasteToken()">🔄 Вставить токен</button>
+    <button onclick="getProfile()">📡 Запросить /api/me</button>
+
+    <span id="pasteStatus" style="color: green; margin-left: 10px"></span>
+
+    <h3>Ответ:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        try {
+          const token = await navigator.clipboard.readText();
+          document.getElementById("tokenInput").value = token;
+          document.getElementById("pasteStatus").innerText = "Вставлено!";
+          setTimeout(
+            () => (document.getElementById("pasteStatus").innerText = ""),
+            2000
+          );
+        } catch (err) {
+          document.getElementById("pasteStatus").innerText =
+            "❌ Не удалось вставить токен";
+        }
+      }
+
+      async function getProfile() {
+        const token = document.getElementById("tokenInput").value.trim();
+
+        const res = await fetch("/api/me", {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

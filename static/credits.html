@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Оформление кредита</title>
+  </head>
+  <body>
+    <h2>Запрос на кредит</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea id="tokenInput" rows="5" cols="60"></textarea><br /><br />
+    <button onclick="pasteToken()">🔄 Вставить токен</button>
+
+    <p>
+      <label>Account ID:</label><br />
+      <input type="number" id="accountId" /><br />
+      <label>Сумма кредита:</label><br />
+      <input type="number" id="amount" step="0.01" /><br />
+      <label>Срок (мес):</label><br />
+      <input type="number" id="termMonths" /><br />
+      <label>Годовая ставка (%):</label><br />
+      <input type="number" id="rate" step="0.01" /><br /><br />
+      <button onclick="submitCredit()">📄 Отправить</button>
+    </p>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        const token = await navigator.clipboard.readText();
+        document.getElementById("tokenInput").value = token;
+      }
+
+      async function submitCredit() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const body = {
+          account_id: parseInt(document.getElementById("accountId").value),
+          amount: parseFloat(document.getElementById("amount").value),
+          term_months: parseInt(document.getElementById("termMonths").value),
+          annual_rate: parseFloat(document.getElementById("rate").value),
+        };
+
+        const res = await fetch("/api/credits", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

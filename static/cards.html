@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Создание карты</title>
+  </head>
+  <body>
+    <h2>Выпустить виртуальную карту</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea
+      id="tokenInput"
+      rows="5"
+      cols="60"
+      placeholder="Вставьте токен"
+    ></textarea
+    ><br /><br />
+    <button onclick="pasteToken()">🔄 Вставить токен</button>
+
+    <p>
+      <label>ID счёта:</label><br />
+      <input type="number" id="accountId" required /><br /><br />
+      <button onclick="createCard()">💳 Выпустить карту</button>
+    </p>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        try {
+          const token = await navigator.clipboard.readText();
+          document.getElementById("tokenInput").value = token;
+        } catch {
+          alert("Не удалось вставить токен");
+        }
+      }
+
+      async function createCard() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const accountId = parseInt(document.getElementById("accountId").value);
+        const res = await fetch("/api/cards", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ account_id: accountId }),
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

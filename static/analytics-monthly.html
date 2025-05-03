@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Аналитика за месяц</title>
+  </head>
+  <body>
+    <h2>Доходы и расходы за месяц</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea id="tokenInput" rows="5" cols="60"></textarea><br /><br />
+    <button onclick="pasteToken()">Вставить токен</button>
+    <button onclick="getAnalytics()">Показать аналитику</button>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        const token = await navigator.clipboard.readText();
+        document.getElementById("tokenInput").value = token;
+      }
+
+      async function getAnalytics() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const res = await fetch("/api/analytics/monthly", {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

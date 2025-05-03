@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Прогноз баланса</title>
+  </head>
+  <body>
+    <h2>Прогноз баланса счёта</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea id="tokenInput" rows="5" cols="60"></textarea><br /><br />
+    <button onclick="pasteToken()">Вставить токен</button>
+
+    <p>
+      <label>Account ID:</label><br />
+      <input type="number" id="accountId" /><br />
+      <label>Период (дней):</label><br />
+      <input type="number" id="days" value="30" /><br /><br />
+      <button onclick="predict()">Рассчитать</button>
+    </p>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        const token = await navigator.clipboard.readText();
+        document.getElementById("tokenInput").value = token;
+      }
+
+      async function predict() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const id = document.getElementById("accountId").value;
+        const days = document.getElementById("days").value;
+        const res = await fetch(`/api/accounts/${id}/predict?days=${days}`, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

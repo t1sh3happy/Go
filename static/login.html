@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Вход</title>
+  </head>
+  <body>
+    <h2>Форма входа</h2>
+    <form id="loginForm">
+      <label>Email:</label><br />
+      <input type="email" id="email" required /><br />
+      <label>Password:</label><br />
+      <input type="password" id="password" required /><br /><br />
+      <button type="submit">Войти</button>
+    </form>
+
+    <h3>JWT Token:</h3>
+    <textarea id="tokenResult" rows="5" cols="60" readonly></textarea
+    ><br /><br />
+    <button onclick="copyToken()">📋 Скопировать токен</button>
+    <span id="copyStatus" style="color: green; margin-left: 10px"></span>
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: document.getElementById("email").value,
+              password: document.getElementById("password").value,
+            }),
+          });
+
+          const json = await res.json();
+          const token = json.token || "❌ Ошибка: токен не получен";
+
+          document.getElementById("tokenResult").value = token;
+          document.getElementById("copyStatus").innerText = "";
+        });
+
+      function copyToken() {
+        const tokenField = document.getElementById("tokenResult");
+        tokenField.select();
+        tokenField.setSelectionRange(0, 99999); // для мобильных
+        document.execCommand("copy");
+
+        document.getElementById("copyStatus").innerText = "Скопировано!";
+      }
+    </script>
+  </body>
+</html>

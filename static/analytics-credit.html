@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Кредитная нагрузка</title>
+  </head>
+  <body>
+    <h2>Анализ кредитной нагрузки</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea id="tokenInput" rows="5" cols="60"></textarea><br /><br />
+    <button onclick="pasteToken()">Вставить токен</button>
+    <button onclick="getLoad()">Показать нагрузку</button>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        const token = await navigator.clipboard.readText();
+        document.getElementById("tokenInput").value = token;
+      }
+
+      async function getLoad() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const res = await fetch("/api/analytics/credit-load", {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>

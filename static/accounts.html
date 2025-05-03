@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Банковские счета</title>
+  </head>
+  <body>
+    <h2>Работа с /api/accounts</h2>
+
+    <label>JWT Token:</label><br />
+    <textarea
+      id="tokenInput"
+      rows="5"
+      cols="60"
+      placeholder="Вставьте токен сюда"
+    ></textarea
+    ><br /><br />
+    <button onclick="pasteToken()">🔄 Вставить токен</button>
+
+    <h3>📤 Создать счёт</h3>
+    <button onclick="createAccount()">Создать</button>
+
+    <h3>📥 Получить мои счета</h3>
+    <button onclick="getAccounts()">Показать</button>
+
+    <h3>Результат:</h3>
+    <pre id="result"></pre>
+
+    <script>
+      async function pasteToken() {
+        try {
+          const token = await navigator.clipboard.readText();
+          document.getElementById("tokenInput").value = token;
+        } catch {
+          alert("Не удалось получить токен из буфера обмена");
+        }
+      }
+
+      async function createAccount() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const res = await fetch("/api/accounts", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+
+      async function getAccounts() {
+        const token = document.getElementById("tokenInput").value.trim();
+        const res = await fetch("/api/accounts", {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+
+        const text = await res.text();
+        document.getElementById("result").innerText = text;
+      }
+    </script>
+  </body>
+</html>
