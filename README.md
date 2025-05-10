@@ -1,6 +1,6 @@
 # GoBankAPI
 
-GoBankAPI — это REST API для банковского сервиса, разработанный на языке Go с акцентом на безопасность, расширяемость и работу с реальными банковскими сценариями.
+GoBankAPI — это REST API для банковского сервиса, разработанный на языке Go с акцентом на безопасность, 2fa, расширяемость и работу с банковскими сценариями.
 
 ## Возможности
 
@@ -15,6 +15,7 @@ GoBankAPI — это REST API для банковского сервиса, ра
   - SMTP (Mailtrap)
   - SOAP-запрос к банку "ЦБ"
 - Финансовая аналитика и прогнозирование баланса
+- Двухфакторная аутентификация
 - HTML-формы для тестирования (без Postman)
 
 ## Как запустить
@@ -40,13 +41,13 @@ RUN_SCHEDULER=true
 Если вы не используете систему миграций, создайте необходимые таблицы вручную:
 
 ```sql
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 CREATE TABLE users (
     id              INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email           TEXT UNIQUE NOT NULL,
     username        TEXT UNIQUE NOT NULL,
     password_hash   TEXT NOT NULL,
+    twofacode     VARCHAR(6), -- Код 2FA, шестизначный
+    twofaexpires  TIMESTAMP,  -- Время истечения кода 2FA
     created_at      TIMESTAMP DEFAULT NOW()
 );
 
@@ -60,8 +61,8 @@ CREATE TABLE accounts (
 
 CREATE TABLE transactions (
     id             INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    from_account_id INT,
-    to_account_id   INT,
+    fromaccountid INT,
+    toaccountid   INT,
     amount          NUMERIC(15,2),
     type            TEXT,
     created_at      TIMESTAMP DEFAULT NOW()
